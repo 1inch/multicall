@@ -23,12 +23,12 @@ export const DEFAULT_MULTICALL_PARAMS: MultiCallWithGasLimitationParams = {
 };
 
 export type MultiCallWithGasLimitationParams = {
-    maxChunkSize: number;
-    retryCount: number;
-    gasBuffer?: number;
+    maxChunkSize: number; // max contract calls per one node call
+    retryCount: number; // max retries on network fail
+    gasBuffer?: number; // safe amount of gas before node call gas limit
     blockNumber?: string;
-    maxGasLimit?: number;
-    gasLimit?: number | undefined;
+    maxGasLimit?: number; // max gas limit per one multiCall (to avoid 5s node timeout)
+    gasLimit?: number | undefined; // gas limit for the multiCall (default: max node view call gas limit)
 };
 
 export const buildMultiCallParams = (
