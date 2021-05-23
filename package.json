@@ -1,0 +1,74 @@
+{
+    "name": "@1inch/multicall",
+    "version": "0.0.1",
+    "description": "High-weight optimized call-processor",
+    "repository": {
+        "type": "git",
+        "url": "ssh://git@github.com:1inch/multicall.git",
+        "directory": "@1inch/multicall"
+    },
+    "scripts": {
+        "build": "tsc",
+        "postbuild": "cp package.json dist && cp README.md dist",
+        "lint": "eslint ./src --ext .js,.ts",
+        "test": "jest --passWithNoTests",
+        "test:coverage": "jest --collectCoverage",
+        "typecheck": "tsc --noEmit --skipLibCheck",
+        "prettier": "prettier --write .",
+        "ci-pipeline": "yarn run lint && yarn run test && yarn run typecheck",
+        "set-npm-auth": "echo \"//npm.pkg.github.com/:_authToken=${NPM_AUTH_TOKEN}\" >> .npmrc",
+        "create-index": "cti src -b && npx replace-in-file \"export * from './abi';\" \" \" ./src/index.ts"
+    },
+    "dependencies": {
+        "@ethersproject/bignumber": "^5.2.0",
+        "web3": "^2.0.0-alpha.1"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.13.16",
+        "@babel/preset-env": "^7.13.15",
+        "@babel/preset-typescript": "^7.13.0",
+        "@types/jest": "^26.0.22",
+        "@typescript-eslint/eslint-plugin": "4",
+        "babel-jest": "^26.6.3",
+        "create-ts-index": "^1.13.3",
+        "eslint": "7",
+        "eslint-config-prettier": "^8.2.0",
+        "eslint-config-standard-with-typescript": "^20.0.0",
+        "eslint-plugin-import": "^2.22.1",
+        "eslint-plugin-node": "11",
+        "eslint-plugin-promise": "4",
+        "eslint-plugin-unused-imports": "^1.1.1",
+        "husky": "^6.0.0",
+        "istanbul-badges-readme": "^1.2.1",
+        "jest": "^26.6.3",
+        "lint-staged": "^10.5.4",
+        "prettier": "^2.2.1",
+        "standard-version": "^9.2.0",
+        "ts-loader": "^9.0.2",
+        "ts-mockito": "^2.6.1",
+        "ts-node": "^9.1.1",
+        "tslib": "^2.2.0",
+        "typescript": "^4.2.4",
+        "replace": "^1.2.1"
+    },
+    "peerDependencies": {
+        "assert": "^2.0.0",
+        "stream": "^0.0.2"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com/1inch"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged && yarn run typecheck"
+        }
+    },
+    "lint-staged": {
+        "*.{js,ts,md,json}": [
+            "yarn run prettier"
+        ],
+        "*.{js,ts}": [
+            "yarn run lint"
+        ]
+    }
+}

@@ -1,0 +1,8 @@
+.huskyroot = true
+
+[*.{js,ts,md,json}]
+indent_style = space
+indent_size = 4
+
+[*.yml]
+indent_size = 2
