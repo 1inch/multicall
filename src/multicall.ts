@@ -20,11 +20,12 @@ export class MultiCall {
     constructor(
         public readonly providerConnector: ProviderConnector,
         public readonly multiCallAddress: string
-    ) {}
+    ) {
+    }
 
     async multiCallWithGasLimitation(
         requests: MultiCallDataWithGasLimit[],
-        params: MultiCallWithGasLimitationParams
+        params: Partial<MultiCallWithGasLimitationParams>
     ): Promise<string[]> {
 
         const {chunks, results} =
@@ -45,11 +46,10 @@ export class MultiCall {
         );
     }
 
-    async multiCallWithGasLimitationExtended<
-        ChunkType extends MultiCallDataWithGasLimit,
-    >(
+    async multiCallWithGasLimitationExtended<ChunkType extends MultiCallDataWithGasLimit,
+        >(
         requests: ChunkType[],
-        params: MultiCallWithGasLimitationParams
+        params: Partial<MultiCallWithGasLimitationParams>
     ): Promise<{
         results: MultiCallWithGasLimitationResult[];
         chunks: ChunkType[][];
@@ -153,7 +153,7 @@ export class MultiCall {
     private async processNotExecutedCallsIfNeeded(
         processedChunks: MultiCallDataWithGasLimit[][],
         processedResults: MultiCallWithGasLimitationResult[],
-        params: MultiCallWithGasLimitationParams
+        params: Partial<MultiCallWithGasLimitationParams>
     ): Promise<MultiCallWithGasLimitationResult[]> {
         const notExecutedCalls: NotExecutedCall[] = [];
         for (let i = 0; i < processedResults.length; i++) {
@@ -181,6 +181,7 @@ export class MultiCall {
             return processedResults;
         }
 
+        // @ts-ignore
         const decreasedMaxChunkSize = Math.floor(params.maxChunkSize / 2);
         if (decreasedMaxChunkSize === 0) {
             throw new Error('multicall: exceeded chunks split');
@@ -288,17 +289,24 @@ export class MultiCall {
             MultiCallABI,
             this.multiCallAddress,
             'multicallWithGasLimitation',
-            [chunk, gasBuffer]
+            [chunk.map((x) => ({to: x.to, data: x.data})), gasBuffer]
         );
         const res = await this.providerConnector.ethCall(
             this.multiCallAddress,
             callData,
             blockNumber
         );
-        const [results, lastSuccessIndex] =
-            this.providerConnector.decodeABIParameterList<
-                [string[], BigNumber]
-            >(['string[]', 'uint256'], res);
+
+        const types = [{
+            name: 'results',
+            type: 'bytes[]'
+        }, {
+            name: 'lastSuccessIndex',
+            type: 'uint256'
+        }];
+
+        const {results, lastSuccessIndex} =
+            this.providerConnector.decodeABIParameterList<MultiCallWithGasLimitationResult>(types, res);
         return {results, lastSuccessIndex: lastSuccessIndex.toString()};
     }
 }

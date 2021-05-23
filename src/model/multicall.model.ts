@@ -31,12 +31,14 @@ export type MultiCallWithGasLimitationParams = {
     gasLimit?: number | undefined;
 };
 
-export const buildMultiCallParams = (params: MultiCallWithGasLimitationParams): MultiCallWithGasLimitationParams => {
+export const buildMultiCallParams = (
+    params: Partial<MultiCallWithGasLimitationParams>
+): MultiCallWithGasLimitationParams => {
     return {
-        blockNumber: params.blockNumber || DEFAULT_MULTICALL_PARAMS.blockNumber,
-        gasBuffer: params.gasBuffer || DEFAULT_MULTICALL_PARAMS.gasBuffer,
-        maxChunkSize: params.maxChunkSize || DEFAULT_MULTICALL_PARAMS.maxChunkSize,
-        maxGasLimit: params.maxGasLimit || DEFAULT_MULTICALL_PARAMS.maxGasLimit,
-        retryCount: params.retryCount || DEFAULT_MULTICALL_PARAMS.retryCount
+        blockNumber: params?.blockNumber || DEFAULT_MULTICALL_PARAMS.blockNumber,
+        gasBuffer: params?.gasBuffer || DEFAULT_MULTICALL_PARAMS.gasBuffer,
+        maxChunkSize: params?.maxChunkSize || DEFAULT_MULTICALL_PARAMS.maxChunkSize,
+        maxGasLimit: params?.maxGasLimit || DEFAULT_MULTICALL_PARAMS.maxGasLimit,
+        retryCount: params?.retryCount || DEFAULT_MULTICALL_PARAMS.retryCount
     };
 }

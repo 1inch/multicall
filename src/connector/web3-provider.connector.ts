@@ -1,10 +1,12 @@
-import {ProviderConnector} from './provider.connector';
+import {ProviderConnector, SolStructType} from './provider.connector';
 import Web3 from 'web3';
 import {AbiItem} from '../model/abi.model';
 import {AbiItem as Web3AbiItem} from 'web3-utils';
 
 export class Web3ProviderConnector implements ProviderConnector {
-    constructor(protected readonly web3Provider: Web3) {}
+
+    constructor(protected readonly web3Provider: Web3) {
+    }
 
     contractEncodeABI(
         abi: AbiItem[],
@@ -16,7 +18,6 @@ export class Web3ProviderConnector implements ProviderConnector {
             abi as Web3AbiItem[],
             address === null ? undefined : address
         );
-
         return contract.methods[methodName](...methodParams).encodeABI();
     }
 
@@ -38,7 +39,7 @@ export class Web3ProviderConnector implements ProviderConnector {
         return this.web3Provider.eth.abi.decodeParameter(type, hex) as T;
     }
 
-    decodeABIParameterList<T>(type: string[], hex: string): T {
+    decodeABIParameterList<T extends Object>(type: string[] | SolStructType[], hex: string): T {
         return this.web3Provider.eth.abi.decodeParameters(type, hex) as T;
     }
 }
