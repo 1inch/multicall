@@ -12,7 +12,7 @@ module.exports = {
         'lines-between-class-members': 'error',
         'padding-line-between-statements': 'error',
         'no-unused-vars': 'off',
-        'max-len': ['error', {code: 100}],
+        'max-len': ['error', {code: 120}],
         'max-depth': ['error', 3],
         'max-lines-per-function': ['error', 70],
         'max-params': ['error', 7],

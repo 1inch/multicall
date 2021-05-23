@@ -3,8 +3,9 @@ import {ProviderConnector} from './connector/provider.connector';
 import {BigNumber} from '@ethersproject/bignumber';
 import {DEFAULT_GAS_LIMIT} from './multicall.const';
 import {
+    buildMultiCallParams,
     MultiCallData,
-    MultiCallDataWithGasLimit,
+    MultiCallDataWithGasLimit, MultiCallWithGasLimitationParams,
     MultiCallWithGasLimitationResult,
 } from './model/multicall.model';
 
@@ -23,27 +24,19 @@ export class MultiCall {
 
     async multiCallWithGasLimitation(
         requests: MultiCallDataWithGasLimit[],
-        gasBuffer = 3000000,
-        maxChunkSize = 500,
-        retryCount = 3,
-        gasLimit?: number | undefined
+        params: MultiCallWithGasLimitationParams
     ): Promise<string[]> {
+
         const {chunks, results} =
             await this.multiCallWithGasLimitationExtended<MultiCallDataWithGasLimit>(
                 requests,
-                gasBuffer,
-                maxChunkSize,
-                retryCount,
-                gasLimit
+                params
             );
 
         const res = await this.processNotExecutedCallsIfNeeded(
             chunks,
             results,
-            gasBuffer,
-            maxChunkSize,
-            retryCount,
-            gasLimit
+            params
         );
 
         return res.reduce(
@@ -53,30 +46,30 @@ export class MultiCall {
     }
 
     async multiCallWithGasLimitationExtended<
-        ChunkType extends MultiCallDataWithGasLimit
+        ChunkType extends MultiCallDataWithGasLimit,
     >(
         requests: ChunkType[],
-        gasBuffer = 3000000,
-        maxChunkSize = 500,
-        retryCount = 3,
-        maxGasLimit = 150000000,
-        gasLimit?: number | undefined
+        params: MultiCallWithGasLimitationParams
     ): Promise<{
         results: MultiCallWithGasLimitationResult[];
         chunks: ChunkType[][];
     }> {
-        if (!gasLimit) {
-            gasLimit = await this.getOnChainCallGasLimit();
-        }
 
-        if (gasLimit > maxGasLimit) {
-            gasLimit = maxGasLimit;
-        }
+        const {
+            gasBuffer,
+            gasLimit,
+            maxGasLimit,
+            maxChunkSize,
+            retryCount,
+            blockNumber
+        } = buildMultiCallParams(params);
+
+        const optimalGasLimit = await this.getGasLimit(gasLimit, maxGasLimit);
 
         const promises: Promise<MultiCallWithGasLimitationResult>[] = [];
         const chunks = chunkArrayTakingIntoGas<ChunkType>(
             requests,
-            gasLimit,
+            optimalGasLimit,
             gasBuffer,
             maxChunkSize
         );
@@ -86,7 +79,8 @@ export class MultiCall {
                 this.singleGasLimitationCallWithRetry(
                     chunks[i],
                     gasBuffer,
-                    retryCount
+                    retryCount,
+                    blockNumber,
                 )
             );
         }
@@ -98,32 +92,33 @@ export class MultiCall {
     async callWithBatchRetry(
         requests: MultiCallData[],
         chunk = 100,
-        retryCount = 3
+        retryCount = 3,
+        blockNumber = 'latest'
     ): Promise<string[]> {
         const promises = [];
         const chunks = chunkArray(requests, chunk);
 
         for (let i = 0; i < chunks.length; i++) {
-            promises.push(this.singleCallWithRetry(chunks[i], retryCount));
+            promises.push(this.singleCallWithRetry(chunks[i], retryCount, blockNumber));
         }
 
         const results = await Promise.all(promises);
         return results.flat();
     }
 
-    async call(requests: MultiCallData[], chunk = 100): Promise<string[]> {
+    async call(requests: MultiCallData[], chunk = 100, blockNumber = 'latest'): Promise<string[]> {
         const promises = [];
         const chunks = chunkArray(requests, chunk);
 
         for (let i = 0; i < chunks.length; i++) {
-            promises.push(this.singleCall(chunks[i]));
+            promises.push(this.singleCall(chunks[i], blockNumber));
         }
 
         const results = await Promise.all(promises);
         return results.flat();
     }
 
-    async getOnChainCallGasLimit(): Promise<number> {
+    async fetchOnChainCallGasLimit(): Promise<number> {
         try {
             const callData = this.providerConnector.contractEncodeABI(
                 MultiCallABI,
@@ -144,13 +139,21 @@ export class MultiCall {
         }
     }
 
+    private async getGasLimit(gasLimit: number | undefined, maxGasLimit: number | undefined): Promise<number> {
+        if (!gasLimit) {
+            gasLimit = await this.fetchOnChainCallGasLimit();
+        }
+
+        if (maxGasLimit && gasLimit > maxGasLimit) {
+            gasLimit = maxGasLimit;
+        }
+        return gasLimit;
+    }
+
     private async processNotExecutedCallsIfNeeded(
         processedChunks: MultiCallDataWithGasLimit[][],
         processedResults: MultiCallWithGasLimitationResult[],
-        gasBuffer: number,
-        maxChunkSize: number,
-        retryCount: number,
-        gasLimit: number | undefined
+        params: MultiCallWithGasLimitationParams
     ): Promise<MultiCallWithGasLimitationResult[]> {
         const notExecutedCalls: NotExecutedCall[] = [];
         for (let i = 0; i < processedResults.length; i++) {
@@ -178,7 +181,7 @@ export class MultiCall {
             return processedResults;
         }
 
-        const decreasedMaxChunkSize = Math.floor(maxChunkSize / 2);
+        const decreasedMaxChunkSize = Math.floor(params.maxChunkSize / 2);
         if (decreasedMaxChunkSize === 0) {
             throw new Error('multicall: exceeded chunks split');
         }
@@ -186,19 +189,13 @@ export class MultiCall {
         const {chunks, results} =
             await this.multiCallWithGasLimitationExtended<NotExecutedCall>(
                 notExecutedCalls,
-                gasBuffer,
-                decreasedMaxChunkSize,
-                retryCount,
-                gasLimit
+                params,
             );
 
         const res = await this.processNotExecutedCallsIfNeeded(
             chunks,
             results,
-            gasBuffer,
-            decreasedMaxChunkSize,
-            retryCount,
-            gasLimit
+            params
         );
 
         for (let i = 0; i < chunks.length; i++) {
@@ -215,10 +212,11 @@ export class MultiCall {
 
     private async singleCallWithRetry(
         chunk: MultiCallData[],
-        retries: number
+        retries: number,
+        blockNumber: string
     ): Promise<string[]> {
         while (retries > 0) {
-            const result = await this.singleCall(chunk).catch((e) => {
+            const result = await this.singleCall(chunk, blockNumber).catch((e) => {
                 console.log(
                     `Retry multicall. Remaing: ${retries}. Error: ${e.toString()}`
                 );
@@ -237,13 +235,15 @@ export class MultiCall {
 
     private async singleGasLimitationCallWithRetry(
         chunk: MultiCallData[],
-        gasBuffer: number,
-        retries: number
+        gasBuffer: number | undefined,
+        retries: number,
+        blockNumber: string | undefined
     ): Promise<MultiCallWithGasLimitationResult> {
         while (retries > 0) {
             const result = await this.singleCallWithGasLimitation(
                 chunk,
-                String(gasBuffer)
+                String(gasBuffer || 0),
+                blockNumber || 'latest'
             ).catch((e) => {
                 console.log(
                     `Retry multicall. Remaing: ${retries}. Error: ${e.toString()}`
@@ -261,7 +261,7 @@ export class MultiCall {
         throw new Error('multicall: retries exceeded');
     }
 
-    private async singleCall(chunk: MultiCallData[]): Promise<string[]> {
+    private async singleCall(chunk: MultiCallData[], blockNumber: string): Promise<string[]> {
         const callData = this.providerConnector.contractEncodeABI(
             MultiCallABI,
             this.multiCallAddress,
@@ -270,7 +270,8 @@ export class MultiCall {
         );
         const res = await this.providerConnector.ethCall(
             this.multiCallAddress,
-            callData
+            callData,
+            blockNumber
         );
         return this.providerConnector.decodeABIParameter<string[]>(
             'string[]',
@@ -280,7 +281,8 @@ export class MultiCall {
 
     private async singleCallWithGasLimitation<T extends MultiCallData>(
         chunk: T[],
-        gasBuffer: string
+        gasBuffer: string,
+        blockNumber: string
     ): Promise<MultiCallWithGasLimitationResult> {
         const callData = this.providerConnector.contractEncodeABI(
             MultiCallABI,
@@ -290,7 +292,8 @@ export class MultiCall {
         );
         const res = await this.providerConnector.ethCall(
             this.multiCallAddress,
-            callData
+            callData,
+            blockNumber
         );
         const [results, lastSuccessIndex] =
             this.providerConnector.decodeABIParameterList<
@@ -300,13 +303,13 @@ export class MultiCall {
     }
 }
 
-export function chunkArrayTakingIntoGas<T extends MultiCallDataWithGasLimit>(
+function chunkArrayTakingIntoGas<T extends MultiCallDataWithGasLimit>(
     array: T[],
     gasLimit: number,
-    gasBuffer: number,
+    gasBuffer: number | undefined,
     maxSize: number
 ): T[][] {
-    const maxGasLimitPerCall = gasLimit - gasBuffer;
+    const maxGasLimitPerCall = gasLimit - (gasBuffer || 0);
     const result: T[][] = [[]];
     let indexToFill = 0;
     let gasUsed = 0;
@@ -326,7 +329,7 @@ export function chunkArrayTakingIntoGas<T extends MultiCallDataWithGasLimit>(
     return result;
 }
 
-export function chunkArray<T extends MultiCallData>(
+function chunkArray<T extends MultiCallData>(
     array: T[],
     size: number
 ): T[][] {
