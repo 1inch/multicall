@@ -186,6 +186,7 @@ export class MultiCall {
         if (decreasedMaxChunkSize === 0) {
             throw new Error('multicall: exceeded chunks split');
         }
+        params.maxChunkSize = decreasedMaxChunkSize;
 
         const {chunks, results} =
             await this.multiCallWithGasLimitationExtended<NotExecutedCall>(

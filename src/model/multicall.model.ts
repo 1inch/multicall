@@ -39,6 +39,7 @@ export const buildMultiCallParams = (
         gasBuffer: params?.gasBuffer || DEFAULT_MULTICALL_PARAMS.gasBuffer,
         maxChunkSize: params?.maxChunkSize || DEFAULT_MULTICALL_PARAMS.maxChunkSize,
         maxGasLimit: params?.maxGasLimit || DEFAULT_MULTICALL_PARAMS.maxGasLimit,
-        retryCount: params?.retryCount || DEFAULT_MULTICALL_PARAMS.retryCount
+        retryCount: params?.retryCount || DEFAULT_MULTICALL_PARAMS.retryCount,
+        gasLimit: params?.gasLimit
     };
 }
