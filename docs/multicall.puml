@@ -1,0 +1,51 @@
+@startuml
+start
+: Input data: {\n   requests: [\n      {to: '0x00', data: '0x001', gas: 1000},\n      {to: '0x00', data: '0x002', gas: 2000}\n   ], \n   gasLimit: 100_000_000\n};
+: Add index to each requests items;
+repeat
+    partition Split_requests_by_chunks {
+        :Each request;
+        repeat
+        if (\nFit into chunk by gas limit\n AND fit by chunk size?\n) then (yes)
+
+        else (no)
+        :Switch to next chunk;
+        endif
+        repeat while (Next request)
+    }
+    partition Execute_chunks {
+        :Each chunk;
+        repeat
+            partition Execute_chunks_with_retries {
+                :Each request in chunk;
+                repeat
+                    if (Are the attempts over?) then (yes)
+                        #pink:Throw error;
+                        stop;
+                    else (no)
+                    endif;
+                    #palegreen:Call contract method 'multicallWithGasLimitation';
+                    if (Response is successful?) then (yes)
+                        break;
+                    else (no)
+                    endif;
+                repeat while (Retry)
+            }
+        repeat while (Next chunk)
+        :Concat execution results;
+    }
+
+if (Are there not executed chunks?) then (yes)
+    :Reduce maxChunkSize by half;
+    if (New maxChunkSize is zero?) then (yes)
+        #pink:Throw error;
+        stop;
+    endif;
+    :Use not executed chunks\n as new requests;
+else (no)
+endif;
+
+repeat while (Are there any more new requests?)
+:Sort results by indexes;
+end
+@enduml

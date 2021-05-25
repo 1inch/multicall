@@ -26,12 +26,13 @@ export function splitRequestsByChunks(
 
         const notFitIntoCurrentChunkGasLimit = gasUsedByCurrentChunk + val.gas >= gasLimit;
         const isChunkSizeExceeded = currentChunk.length === maxChunkSize;
-
         const shouldSwitchToNextChunk = notFitIntoCurrentChunkGasLimit || isChunkSizeExceeded;
+
         if (shouldSwitchToNextChunk) {
             if (chunks[currentChunkIndex].length === 0) {
                 throw new Error('one of the first calls in a chunk not fit into gas limit');
             }
+
             currentChunkIndex++;
             gasUsedByCurrentChunk = 0;
         }
