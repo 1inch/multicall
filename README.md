@@ -158,7 +158,7 @@ const requests: MultiCallRequest[] = tokens.map((tokenAddress) => {
             'balanceOf',
             [walletAddress]
         ),
-        gas: balanceOfGasLimit
+        gas: balanceOfGasUsage
     };
 });
 
