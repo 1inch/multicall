@@ -8,8 +8,8 @@ import {
 } from './multicall-model';
 import MultiCallABI from './abi/MultiCall.abi.json';
 import { concatExecutionResults, requestsToMulticallItems, splitRequestsByChunks } from './multicall.helpers';
-import { ProviderConnector } from '../dist';
 import { defaultGasLimitParams } from './gas-limit.service';
+import {ProviderConnector} from "./connector";
 
 const multicallResultTypes = [{
     name: 'results',
@@ -132,7 +132,6 @@ export class MultiCallService {
             MultiCallABI,
             this.multiCallAddress,
             'multicallWithGasLimitation',
-            // TODO: why we send gasBuffer to contract?
             [chunk.map((x) => ({ to: x.to, data: x.data })), this.params.gasBuffer]
         );
         const response = await connector.ethCall(

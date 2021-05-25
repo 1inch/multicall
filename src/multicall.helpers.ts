@@ -24,18 +24,22 @@ export function splitRequestsByChunks(
 
         const currentChunk = chunks[currentChunkIndex];
 
+        const notFitIntoCurrentChunkGasLimit = gasUsedByCurrentChunk + val.gas >= gasLimit;
+        const isChunkSizeExceeded = currentChunk.length === maxChunkSize;
+
+        const shouldSwitchToNextChunk = notFitIntoCurrentChunkGasLimit || isChunkSizeExceeded;
+        if (shouldSwitchToNextChunk) {
+            if (chunks[currentChunkIndex].length === 0) {
+                throw new Error('one of the first calls in a chunk not fit into gas limit');
+            }
+            currentChunkIndex++;
+            gasUsedByCurrentChunk = 0;
+        }
+
         currentChunk.push({
             ...val,
             index
         });
-
-        const shouldSwitchToNextChunk = gasUsedByCurrentChunk >= gasLimit
-            || currentChunk.length === maxChunkSize;
-
-        if (shouldSwitchToNextChunk) {
-            currentChunkIndex++;
-            gasUsedByCurrentChunk = 0;
-        }
 
         gasUsedByCurrentChunk += val.gas;
 
