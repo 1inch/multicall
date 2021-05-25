@@ -14,7 +14,8 @@ import MultiCallABI from './abi/MultiCall.abi.json';
 import {
     callWithRetries,
     concatExecutionResults,
-    requestsToMulticallItems, splitRequestsByChunks,
+    requestsToMulticallItems,
+    splitRequestsByChunks,
     splitRequestsByChunksWithGas
 } from './multicall.helpers';
 import { defaultGasLimitParams } from './gas-limit.service';
@@ -181,7 +182,7 @@ export class MultiCallService {
         );
 
         return this.connector.decodeABIParameter<string[]>(
-            'string[]',
+            'bytes[]',
             response
         );
     }
