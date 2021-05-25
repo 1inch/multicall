@@ -5,7 +5,7 @@ import {
     MultiCallRequestWithGas,
     MultiCallRequest,
     MultiCallChunks
-} from './multicall-model';
+} from './model/multicall.model';
 
 export function requestsToMulticallItems(requests: MultiCallRequestWithGas[]): MultiCallItemWithGas[] {
     return requests.map((request, index) => {

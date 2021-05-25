@@ -9,7 +9,7 @@ import {
     MultiCallWithGasContractResponse,
     MultiCallParams,
     MultiCallRequest
-} from './multicall-model';
+} from './model/multicall.model';
 import MultiCallABI from './abi/MultiCall.abi.json';
 import {
     callWithRetries,
