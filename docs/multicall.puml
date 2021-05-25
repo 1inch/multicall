@@ -1,0 +1,63 @@
+@startuml
+|Start|
+start
+: Input data: {
+   requests: [
+      {to: '0x00', data: '0x001', gas: 1000},
+      {to: '0x00', data: '0x002', gas: 2000},
+      ...
+   ],
+   gasLimit: 150_000_000,
+   params: {
+       maxChunkSize: 500,
+       retriesLimit: 3,
+       blockNumber: 'latest',
+       gasBuffer: 3000000
+   } //
+};
+: Add index to each requests items;
+|Split chunks|
+repeat
+    partition Split_requests_by_chunks {
+        repeat :Each request;
+        if (\nFit into chunk by gas limit\n AND fit by chunk size?\n) then (yes)
+
+        else (no)
+        :Switch to next chunk;
+        endif
+        repeat while (Has next request?)  is (yes) not (no)
+    }
+|Execute chunks|
+    partition Execute_chunks(in_parallel) {
+        repeat :Each chunk;
+            partition Execute_chunks_with_retries {
+                repeat :Attempt to call contract;
+                    if (Are the attempts over?) then (yes)
+                        #pink:Throw error;
+                        stop;
+                    else (no)
+                    endif;
+                    #palegreen:Call contract method 'multicallWithGasLimitation';
+                repeat while (Response is successful?) is (no) not (yes)
+            }
+        repeat while (Has next chunk?) is (yes) not (no)
+        :Concat chunks executions results;
+    }
+|Process execution result|
+#palegreen:Save executed chunks results (append to previous);
+
+if (Are there not executed chunks?) then (yes)
+    :Reduce maxChunkSize by half;
+    if (New maxChunkSize is zero?) then (yes)
+        #pink:Throw error;
+        stop;
+    endif;
+    :Use not executed chunks\n as new requests;
+else (no)
+endif;
+
+repeat while (Are there any more new requests?)
+:Sort results by indexes;
+#palegreen:Return results;
+end
+@enduml
