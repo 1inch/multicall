@@ -19,8 +19,7 @@ import {
     splitRequestsByChunksWithGas
 } from './multicall.helpers';
 import { defaultGasLimitParams } from './gas-limit.service';
-import {ProviderConnector} from "./connector";
-import { MultiCallData } from "./model";
+import { ProviderConnector } from "./connector";
 
 const multicallResultTypes = [{
     name: 'results',
@@ -72,7 +71,7 @@ export class MultiCallService {
     }
 
     async callByChunks(
-        requests: MultiCallData[],
+        requests: MultiCallRequest[],
         params: MultiCallParams = defaultParamsByChunkSize
     ): Promise<string[]> {
         const chunks = splitRequestsByChunks(requests, params.chunkSize);
