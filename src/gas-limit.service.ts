@@ -2,7 +2,7 @@ import { GasLimitParams } from './model/multicall.model';
 import MultiCallABI from './abi/MultiCall.abi.json';
 import { BigNumber } from '@ethersproject/bignumber';
 import { DEFAULT_GAS_LIMIT } from './multicall.const';
-import { ProviderConnector } from '../dist';
+import {ProviderConnector} from "./connector";
 
 export const defaultGasLimitParams: Pick<GasLimitParams, 'gasBuffer' | 'maxGasLimit'> = {
     gasBuffer: 3000000,
