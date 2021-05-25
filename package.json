@@ -45,7 +45,6 @@
         "lint-staged": "^10.5.4",
         "prettier": "^2.2.1",
         "replace": "^1.2.1",
-        "standard-version": "^9.3.0",
         "ts-loader": "^9.0.2",
         "ts-mockito": "^2.6.1",
         "ts-node": "^9.1.1",

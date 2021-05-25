@@ -35,9 +35,6 @@ jobs:
       - name: Set git credentials
         uses: fregante/setup-git-user@v1
 
-      - name: Release
-        run: git tag && yarn run release -- --release-as ${{ github.event.inputs.bumpType }}
-
       - name: Build
         run: yarn run build
 
