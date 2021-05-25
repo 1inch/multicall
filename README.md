@@ -63,7 +63,7 @@ const balances = await Promise.all(contractCalls);
 The downside to this solution is that you make as many requests for a contract as you have tokens on the list.  
 And if the list is large enough, you will create a significant load on the provider.
 
-### Simple multiCall
+### Simple MultiCall
 
 A **multiCallService.callByChunks()** contract takes a list of requests, splits them into chunks and calls the provider in batches.
 
@@ -112,10 +112,10 @@ Got better! Instead of making a separate request to the provider for each item, 
 >Note:
 > If the call to this method exceeds the gas limit, then the entire request will be reverted.
 
-### multiCall by gas limit
+### MultiCall by gas limit
 **Problem:**  
 The point is that the node has a limit for gas per call of the contract.  
-And it may happen that by making a simple multiCall we will not meet this limit.  
+And it may happen that by making a simple MultiCall we will not meet this limit.  
 If the gas limit on the node is large enough, we may face a time limit on the execution of the contract method.  
 
 In total, **there are 2 restrictions on a node:**
@@ -189,7 +189,7 @@ If the call to the contract all the same does not fit into the gas limit, then t
 **You can see a more detailed description of the library's work in the diagrams below.**
 
 ### GasLimitService
-This service is used to correctly calculate the gas limit for calling a multiCall.  
+This service is used to correctly calculate the gas limit for calling a MultiCall.  
 The basic formula for calculating the limit is as follows:
 ```typescript
 const gasLimitForMultiCall = Math.min(gasLimitFromNode, maxGasLimit) - gasBuffer;
