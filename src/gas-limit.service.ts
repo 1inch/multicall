@@ -12,14 +12,15 @@ export const defaultGasLimitParams: Pick<GasLimitParams, 'gasBuffer' | 'maxGasLi
 export class GasLimitService {
     constructor(
         private connector: ProviderConnector,
-        private multiCallAddress: string,
-        public gasBuffer: number = defaultGasLimitParams.gasBuffer
+        private multiCallAddress: string
     ) {
     }
 
     async calculateGasLimit(
         gasLimitParams: Partial<GasLimitParams> = defaultGasLimitParams
     ): Promise<number> {
+        const gasBuffer = gasLimitParams.gasBuffer || defaultGasLimitParams.gasBuffer;
+
         const gasLimit = await (gasLimitParams.gasLimit
             ? Promise.resolve(gasLimitParams.gasLimit)
             : this.fetchGasLimit());
@@ -28,7 +29,7 @@ export class GasLimitService {
 
         const minGasLimit = Math.min(gasLimit, maxGasLimit);
 
-        return minGasLimit - this.gasBuffer;
+        return minGasLimit - gasBuffer;
     }
 
     private async fetchGasLimit(): Promise<number> {

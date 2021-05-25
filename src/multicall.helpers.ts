@@ -1,6 +1,13 @@
-import { MultiCallChunks, MultiCallExecutionResult, MultiCallItem, MultiCallRequest } from './multicall-model';
+import {
+    MultiCallWithGasChunks,
+    MultiCallExecutionResult,
+    MultiCallItemWithGas,
+    MultiCallRequestWithGas,
+    MultiCallRequest,
+    MultiCallChunks
+} from './multicall-model';
 
-export function requestsToMulticallItems(requests: MultiCallRequest[]): MultiCallItem[] {
+export function requestsToMulticallItems(requests: MultiCallRequestWithGas[]): MultiCallItemWithGas[] {
     return requests.map((request, index) => {
         return {
             ...request,
@@ -9,11 +16,11 @@ export function requestsToMulticallItems(requests: MultiCallRequest[]): MultiCal
     });
 }
 
-export function splitRequestsByChunks(
-    requests: MultiCallRequest[],
+export function splitRequestsByChunksWithGas(
+    requests: MultiCallRequestWithGas[],
     gasLimit: number,
     maxChunkSize: number
-): MultiCallChunks {
+): MultiCallWithGasChunks {
     let currentChunkIndex = 0;
     let gasUsedByCurrentChunk = 0;
 
@@ -46,6 +53,24 @@ export function splitRequestsByChunks(
 
         return chunks;
 
+    }, [] as MultiCallWithGasChunks);
+}
+
+export function splitRequestsByChunks(requests: MultiCallRequest[], chunkSize: number): MultiCallChunks {
+    let currentChunkIndex = 0;
+
+    return requests.reduce((chunks, request) => {
+        if (currentChunkIndex === chunkSize) {
+            currentChunkIndex++;
+        }
+
+        if (!chunks[currentChunkIndex]) {
+            chunks[currentChunkIndex] = [];
+        }
+
+        chunks[currentChunkIndex].push(request);
+
+        return chunks;
     }, [] as MultiCallChunks);
 }
 
@@ -59,4 +84,22 @@ export function concatExecutionResults(results: MultiCallExecutionResult[]): Mul
         responses: [],
         notExecutedChunks: []
     });
+}
+
+
+export async function callWithRetries<T>(
+    retriesLimit: number,
+    fn: () => Promise<T>
+): Promise<T> {
+    let retriesLeft = retriesLimit;
+
+    while (retriesLeft > 0) {
+        try {
+            return await fn();
+        } catch (error) {
+            retriesLeft -= 1;
+        }
+    }
+
+    throw new Error('multicall: retries exceeded');
 }

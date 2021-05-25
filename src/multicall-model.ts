@@ -1,32 +1,45 @@
 export interface MultiCallRequest {
     to: string;
     data: string;
+}
+
+export interface MultiCallRequestWithGas extends MultiCallRequest {
     gas: number;
 }
 
-export interface MultiCallItem extends MultiCallRequest {
+export interface MultiCallItemWithGas extends MultiCallRequestWithGas {
     index: number;
 }
 
-export interface MultiCallItemWithResponse extends MultiCallItem {
+export interface MultiCallItemWithGasResult extends MultiCallItemWithGas {
     result: string;
 }
 
-export type MultiCallChunk = MultiCallItem[];
+export type MultiCallChunk = MultiCallRequest[];
 
 export type MultiCallChunks = MultiCallChunk[];
 
-export interface MultiCallContractResponse {
+export type MultiCallWithGasChunk = MultiCallItemWithGas[];
+
+export type MultiCallWithGasChunks = MultiCallWithGasChunk[];
+
+export interface MultiCallWithGasContractResponse {
     results: string[];
     lastSuccessIndex: string;
 }
 
 export interface MultiCallExecutionResult {
-    responses: MultiCallItemWithResponse[];
-    notExecutedChunks: MultiCallItem[];
+    responses: MultiCallItemWithGasResult[];
+    notExecutedChunks: MultiCallItemWithGas[];
 }
 
 export interface MultiCallParams {
+    chunkSize: number;
+    retriesLimit: number;
+    blockNumber: string | number;
+}
+
+export interface MultiCallWithGasParams {
     maxChunkSize: number;
     retriesLimit: number;
     blockNumber: string | number;
