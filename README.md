@@ -141,7 +141,7 @@ const provider = new Web3ProviderConnector(new Web3('...'));
 const gasLimitService = new GasLimitService(provider, contractAddress);
 const multiCallService = new MultiCallService(provider, contractAddress);
 
-const balanceOfGasLimit = 30_000;
+const balanceOfGasUsage = 30_000;
 
 const tokens = [
     '0x6b175474e89094c44da98b954eedeac495271d0f',
