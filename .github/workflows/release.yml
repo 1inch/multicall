@@ -34,4 +34,6 @@ jobs:
         run: yarn run build
 
       - name: Publish
-        run: git push --follow-tags origin master && cd dist && npm publish
+        run: git push --follow-tags origin master && cd dist && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
