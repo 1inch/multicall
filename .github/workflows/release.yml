@@ -3,11 +3,6 @@ name: Release
 on:
   # manual trigger
   workflow_dispatch:
-    inputs:
-      bumpType:
-        description: 'Bump type (path, minor, major)'
-        required: true
-        default: 'patch'
 
 jobs:
   release:
