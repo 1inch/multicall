@@ -21,19 +21,6 @@ jobs:
       - name: Install yarn
         run: npm install --global yarn
 
-      - name: Set npm auth
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" >> .npmrc
-
-      - name: Install dependency
-        run: yarn install
-
-      - name: Set git credentials
-        uses: fregante/setup-git-user@v1
-
-      - name: Build
-        run: yarn run build
-
-      - name: Publish
-        run: git push --follow-tags origin master && cd dist && npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_AUTH_TOKEN }}
