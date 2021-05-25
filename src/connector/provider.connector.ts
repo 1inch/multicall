@@ -19,7 +19,7 @@ export interface ProviderConnector {
         blockNumber?: string
     ): Promise<string>;
 
-    decodeABIParameter<T>(type: string | {}, hex: string): T;
+    decodeABIParameter<T>(type: string | SolStructType, hex: string): T;
 
-    decodeABIParameterList<T extends Object>(type: string[] | SolStructType[], hex: string): T;
+    decodeABIParameterList<T>(type: string[] | SolStructType[], hex: string): T;
 }

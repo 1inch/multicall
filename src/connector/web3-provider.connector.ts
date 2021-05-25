@@ -35,11 +35,11 @@ export class Web3ProviderConnector implements ProviderConnector {
         );
     }
 
-    decodeABIParameter<T>(type: string, hex: string): T {
+    decodeABIParameter<T>(type: string | SolStructType, hex: string): T {
         return this.web3Provider.eth.abi.decodeParameter(type, hex) as T;
     }
 
-    decodeABIParameterList<T extends Object>(type: string[] | SolStructType[], hex: string): T {
+    decodeABIParameterList<T>(type: string[] | SolStructType[], hex: string): T {
         return this.web3Provider.eth.abi.decodeParameters(type, hex) as T;
     }
 }
