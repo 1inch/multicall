@@ -106,6 +106,8 @@ export class MultiCallService {
             return newResults;
         }
 
+        params.maxChunkSize = newMaxChunkSize;
+
         if (newMaxChunkSize === 0) {
             throw new Error('multicall: exceeded chunks split');
         }
