@@ -17,14 +17,14 @@ export function requestsToMulticallItems(requests: MultiCallRequestWithGas[]): M
 }
 
 export function splitRequestsByChunksWithGas(
-    requests: MultiCallRequestWithGas[],
+    requests: MultiCallItemWithGas[],
     gasLimit: number,
     maxChunkSize: number
 ): MultiCallWithGasChunks {
     let currentChunkIndex = 0;
     let gasUsedByCurrentChunk = 0;
 
-    return requests.reduce((chunks, val, index) => {
+    return requests.reduce((chunks, val) => {
         if (!chunks[currentChunkIndex]) {
             chunks[currentChunkIndex] = [];
         }
@@ -42,14 +42,11 @@ export function splitRequestsByChunksWithGas(
 
             currentChunkIndex++;
             gasUsedByCurrentChunk = 0;
+        } else {
+            gasUsedByCurrentChunk += val.gas;
         }
 
-        currentChunk.push({
-            ...val,
-            index
-        });
-
-        gasUsedByCurrentChunk += val.gas;
+        currentChunk.push(val);
 
         return chunks;
 

@@ -29,14 +29,14 @@ const multicallResultTypes = [{
     type: 'uint256'
 }];
 
-const defaultParamsWithGas: MultiCallWithGasParams = {
+export const defaultParamsWithGas: MultiCallWithGasParams = {
     maxChunkSize: 500,
     retriesLimit: 3,
     blockNumber: 'latest',
     gasBuffer: defaultGasLimitParams.gasBuffer
 };
 
-const defaultParamsByChunkSize: MultiCallParams  = {
+export const defaultParamsByChunkSize: MultiCallParams  = {
     chunkSize: 100,
     retriesLimit: 3,
     blockNumber: 'latest'
@@ -135,6 +135,7 @@ export class MultiCallService {
 
         const results: MultiCallExecutionResult[] = chunksResults.map((result, index) => {
             const chunk = chunks[index];
+            const lastSuccessIndex = +result.lastSuccessIndex + 1;
 
             const responses = chunk.map((item, i) => {
                 return {
@@ -144,8 +145,8 @@ export class MultiCallService {
             });
 
             return {
-                responses,
-                notExecutedChunks: chunk.slice(+result.lastSuccessIndex + 1, chunk.length)
+                responses: responses.slice(0, lastSuccessIndex),
+                notExecutedChunks: chunk.slice(lastSuccessIndex, chunk.length)
             }
         });
 

@@ -1,4 +1,4 @@
-.huskyroot = true
+root = true
 
 [*.{js,ts,md,json}]
 indent_style = space
@@ -6,3 +6,6 @@ indent_size = 4
 
 [*.yml]
 indent_size = 2
+
+[*.ts]
+ij_typescript_use_double_quotes = false
