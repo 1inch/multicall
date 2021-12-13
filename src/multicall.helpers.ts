@@ -94,6 +94,7 @@ export async function callWithRetries<T>(
         try {
             return await fn();
         } catch (error) {
+            console.warn(`multicall chunck failed: ${error.toString()}`)
             retriesLeft -= 1;
         }
     }

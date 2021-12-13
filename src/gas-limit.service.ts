@@ -1,6 +1,5 @@
 import { GasLimitParams } from './model/multicall.model';
 import MultiCallABI from './abi/MultiCall.abi.json';
-import { BigNumber } from '@ethersproject/bignumber';
 import { DEFAULT_GAS_LIMIT } from './multicall.const';
 import {ProviderConnector} from "./connector";
 
@@ -45,7 +44,7 @@ export class GasLimitService {
                 callData
             );
             return +this.connector
-                .decodeABIParameter<BigNumber>('uint256', res)
+                .decodeABIParameter<string>('uint256', res)
                 .toString();
         } catch (e) {
             console.log('cannot get gas left: ', e.toString());

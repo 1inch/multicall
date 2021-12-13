@@ -77,7 +77,7 @@ describe('MultiCallService', () => {
             );
 
             const balances = res.map((x) => {
-                return provider.decodeABIParameter<BigNumber>('uint256', x).toString()
+                return provider.decodeABIParameter<string>('uint256', x).toString()
             });
 
             expect(balances).toEqual(expectedBalances);
