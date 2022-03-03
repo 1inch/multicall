@@ -1,8 +1,8 @@
 <div align="center">
-    <img src="https://github.com/1inch/limit-order-protocol/blob/master/.github/1g.svg#gh-light-mode-only">
+    <img src="https://github.com/1inch/limit-order-protocol/blob/master/.github/1inch_github_w.svg#gh-light-mode-only">
     <img src="https://github.com/1inch/limit-order-protocol/blob/master/.github/1inch_github_b.svg#gh-dark-mode-only">
 </div>
-
+g
 # Multicall
 
 ### This is the package for high-weight optimized calls to blockchain nodes
