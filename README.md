@@ -30,6 +30,8 @@ yarn install @1inch/multicall
 -   Arbitrum One: `0x11DEE30E710B8d4a8630392781Cc3c0046365d4c`
 -   Gnosis Chain: `0xE295aD71242373C37C5FdA7B57F26f9eA1088AFe`
 -   Avalanche: `0xC4A8B7e29E3C8ec560cd4945c1cF3461a85a148d`
+-   Fantom: `0xA31bB36c5164B165f9c36955EA4CcBaB42B3B28E`
+-   Optimism: `0xE295aD71242373C37C5FdA7B57F26f9eA1088AFe`
 
 ## Motivation
 The **MultiCall** contract is designed to execute multiple view calls at one time.  
