@@ -19,7 +19,7 @@ npm install @1inch/multicall
 ### Yarn
 
 ```
-yarn install @1inch/multicall
+yarn add @1inch/multicall
 ```
 
 ## Onchain addresses
