@@ -1,7 +1,6 @@
 import {ProviderConnector, SolStructType} from './provider.connector';
 import {AbiItem} from '../model/abi.model';
 import {Interface, defaultAbiCoder, ParamType} from 'ethers/lib/utils';
-import {JsonFragmentType} from '@ethersproject/abi/src.ts/fragments';
 
 type Web3 = {
     eth: {
@@ -10,7 +9,8 @@ type Web3 = {
 }
 
 export class Web3ProviderConnector implements ProviderConnector {
-    constructor(protected readonly web3Provider: Web3) {}
+    constructor(protected readonly web3Provider: Web3) {
+    }
 
     contractEncodeABI(
         abi: AbiItem[],
@@ -44,7 +44,10 @@ export class Web3ProviderConnector implements ProviderConnector {
 
     decodeABIParameterList<T>(type: (string | SolStructType)[], hex: string): T {
         const types = type.map((t) => {
-            return typeof t === 'string' ? t : ParamType.fromObject(t as JsonFragmentType)
+            return typeof t === 'string' ? t : ParamType.fromObject(t as {
+                readonly name?: string;
+                readonly type?: string;
+            })
         })
 
         return defaultAbiCoder.decode(types, hex) as unknown as T;
