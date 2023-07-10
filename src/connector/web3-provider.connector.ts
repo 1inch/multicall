@@ -1,30 +1,27 @@
 import {ProviderConnector, SolStructType} from './provider.connector';
-import Web3 from 'web3';
 import {AbiItem} from '../model/abi.model';
-import {AbiItem as Web3AbiItem} from 'web3-utils';
-import Contract from 'web3-eth-contract'
+import {Interface, defaultAbiCoder, ParamType} from 'ethers/lib/utils';
+
+type Web3 = {
+    eth: {
+        call(callInfo: { data: string, to: string }, blockNumber: number | string): Promise<string>
+    }
+}
 
 export class Web3ProviderConnector implements ProviderConnector {
-
     constructor(protected readonly web3Provider: Web3) {
-        // eslint-disable-next-line
-        // @ts-ignore
-        Contract.setProvider(web3Provider.currentProvider)
     }
 
     contractEncodeABI(
         abi: AbiItem[],
-        address: string | null,
+        _address: string | null,
         methodName: string,
         methodParams: unknown[]
     ): string {
-        // eslint-disable-next-line
-        // @ts-ignore
-        const contract = new Contract(
-            abi as Web3AbiItem[],
-            address === null ? undefined : address
-        );
-        return contract.methods[methodName](...methodParams).encodeABI();
+
+        return new Interface(
+            abi,
+        ).encodeFunctionData(methodName, methodParams);
     }
 
     ethCall(
@@ -42,10 +39,17 @@ export class Web3ProviderConnector implements ProviderConnector {
     }
 
     decodeABIParameter<T>(type: string | SolStructType, hex: string): T {
-        return this.web3Provider.eth.abi.decodeParameter(type, hex) as T;
+        return this.decodeABIParameterList<[T]>([type], hex)[0];
     }
 
-    decodeABIParameterList<T>(type: string[] | SolStructType[], hex: string): T {
-        return this.web3Provider.eth.abi.decodeParameters(type, hex) as T;
+    decodeABIParameterList<T>(type: (string | SolStructType)[], hex: string): T {
+        const types = type.map((t) => {
+            return typeof t === 'string' ? t : ParamType.fromObject(t as {
+                readonly name?: string;
+                readonly type?: string;
+            })
+        })
+
+        return defaultAbiCoder.decode(types, hex) as unknown as T;
     }
 }

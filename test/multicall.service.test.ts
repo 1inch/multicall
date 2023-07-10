@@ -1,7 +1,6 @@
 import {CHAIN_1_MULTICALL_ADDRESS, Web3ProviderConnector} from '../src';
 import Web3 from 'web3';
 import ERC20ABI from './ERC20.abi.json';
-import {BigNumber} from '@ethersproject/bignumber';
 import {ProviderConnector} from '../dist';
 import { GasLimitService } from '../src/gas-limit.service';
 import { MultiCallService } from '../src/multicall.service';
@@ -100,7 +99,7 @@ describe('MultiCallService', () => {
             );
 
             const balances = res.map((x) => {
-                return provider.decodeABIParameter<BigNumber>('uint256', x).toString()
+                return provider.decodeABIParameter('uint256', x).toString()
             });
 
             expect(balances).toEqual(expectedBalances);
