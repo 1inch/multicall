@@ -1,29 +1,40 @@
-name: Release
+name: Publish package
 
 on:
-  # manual trigger
-  workflow_dispatch:
+  push:
+    tags:
+      - v*.*.*
 
 jobs:
-  release:
-    runs-on: ubuntu-20.04
-    env:
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Checkout code into workspace directory
-        uses: actions/checkout@v2
-
-      - name: Setup Node
-        uses: actions/setup-node@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: 18
+          registry-url: 'https://npm.pkg.github.com'
+          scope: ${{ github.repository_owner }}
 
-      - name: Install yarn
-        run: npm install --global yarn
+      - name: Update package.json
+        run: |
+          TAG_NAME=${GITHUB_REF/refs\/tags\//}
+          PACKAGE_VERSION=${TAG_NAME#v}
+          echo "Updating package.json to version $PACKAGE_VERSION"
+          cat <<< $(jq -r ".version=\"$PACKAGE_VERSION\"" package.json) > package.json
+          cat package.json
 
-      - name: Install dependency
-        run: yarn install
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Build
+        run: yarn build
+
+      - name: Publish
+        run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
