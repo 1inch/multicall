@@ -68,5 +68,6 @@ jobs:
 
       - name: Publish
         run: yarn publish
+        working-directory: dist
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
