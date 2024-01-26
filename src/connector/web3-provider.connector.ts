@@ -2,9 +2,14 @@ import {ProviderConnector, SolStructType} from './provider.connector';
 import {AbiItem} from '../model/abi.model';
 import {Interface, defaultAbiCoder, ParamType} from 'ethers/lib/utils';
 
+export interface IWeb3CallInfo {
+    data: string,
+    to: string
+}
+
 export interface IWeb3 {
     eth: {
-        call(callInfo: { data: string, to: string }, blockNumber: number | string): Promise<string>
+        call(callInfo: IWeb3CallInfo, blockNumber: number | string): Promise<string>
     }
 }
 
