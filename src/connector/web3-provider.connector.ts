@@ -2,14 +2,19 @@ import {ProviderConnector, SolStructType} from './provider.connector';
 import {AbiItem} from '../model/abi.model';
 import {Interface, defaultAbiCoder, ParamType} from 'ethers/lib/utils';
 
-type Web3 = {
+export interface IWeb3CallInfo {
+    data: string,
+    to: string
+}
+
+export interface IWeb3 {
     eth: {
-        call(callInfo: { data: string, to: string }, blockNumber: number | string): Promise<string>
+        call(callInfo: IWeb3CallInfo, blockNumber: number | string): Promise<string>
     }
 }
 
 export class Web3ProviderConnector implements ProviderConnector {
-    constructor(protected readonly web3Provider: Web3) {
+    constructor(protected readonly web3Provider: IWeb3) {
     }
 
     contractEncodeABI(
