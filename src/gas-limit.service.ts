@@ -47,7 +47,7 @@ export class GasLimitService {
                 .decodeABIParameter<string>('uint256', res)
                 .toString();
         } catch (e) {
-            console.log('cannot get gas left: ', e.toString());
+            console.log('cannot get gas left: ', e?.toString());
             return DEFAULT_GAS_LIMIT;
         }
     }
