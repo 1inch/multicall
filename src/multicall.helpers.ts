@@ -7,9 +7,7 @@ import {
     MultiCallChunks
 } from './model/multicall.model'
 
-export function requestsToMulticallItems(
-    requests: MultiCallRequestWithGas[]
-): MultiCallItemWithGas[] {
+export function requestsToMulticallItems(requests: MultiCallRequestWithGas[]): MultiCallItemWithGas[] {
     return requests.map((request, index) => {
         return {
             ...request,
@@ -33,17 +31,13 @@ export function splitRequestsByChunksWithGas(
 
         const currentChunk = chunks[currentChunkIndex]
 
-        const notFitIntoCurrentChunkGasLimit =
-            gasUsedByCurrentChunk + val.gas >= gasLimit
+        const notFitIntoCurrentChunkGasLimit = gasUsedByCurrentChunk + val.gas >= gasLimit
         const isChunkSizeExceeded = currentChunk.length === maxChunkSize
-        const shouldSwitchToNextChunk =
-            notFitIntoCurrentChunkGasLimit || isChunkSizeExceeded
+        const shouldSwitchToNextChunk = notFitIntoCurrentChunkGasLimit || isChunkSizeExceeded
 
         if (shouldSwitchToNextChunk) {
             if (chunks[currentChunkIndex].length === 0) {
-                throw new Error(
-                    'one of the first calls in a chunk not fit into gas limit'
-                )
+                throw new Error('one of the first calls in a chunk not fit into gas limit')
             }
 
             currentChunkIndex++
@@ -58,10 +52,7 @@ export function splitRequestsByChunksWithGas(
     }, [] as MultiCallWithGasChunks)
 }
 
-export function splitRequestsByChunks(
-    requests: MultiCallRequest[],
-    chunkSize: number
-): MultiCallChunks {
+export function splitRequestsByChunks(requests: MultiCallRequest[], chunkSize: number): MultiCallChunks {
     let currentChunkIndex = 0
 
     return requests.reduce((chunks, request) => {
@@ -79,16 +70,12 @@ export function splitRequestsByChunks(
     }, [] as MultiCallChunks)
 }
 
-export function concatExecutionResults(
-    results: MultiCallExecutionResult[]
-): MultiCallExecutionResult {
+export function concatExecutionResults(results: MultiCallExecutionResult[]): MultiCallExecutionResult {
     return results.reduce(
         (acc, val) => {
             return {
                 responses: acc.responses.concat(val.responses),
-                notExecutedChunks: acc.notExecutedChunks.concat(
-                    val.notExecutedChunks
-                )
+                notExecutedChunks: acc.notExecutedChunks.concat(val.notExecutedChunks)
             }
         },
         {
@@ -98,10 +85,7 @@ export function concatExecutionResults(
     )
 }
 
-export async function callWithRetries<T>(
-    retriesLimit: number,
-    fn: () => Promise<T>
-): Promise<T> {
+export async function callWithRetries<T>(retriesLimit: number, fn: () => Promise<T>): Promise<T> {
     let retriesLeft = retriesLimit
 
     while (retriesLeft > 0) {

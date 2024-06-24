@@ -11,21 +11,11 @@ describe('MultiCallService', () => {
 
     beforeEach(() => {
         connector = mock<ProviderConnector>()
-        multiCallService = new MultiCallService(
-            instance(connector),
-            multiCallAddress
-        )
+        multiCallService = new MultiCallService(instance(connector), multiCallAddress)
     })
 
     beforeEach(() => {
-        when(
-            connector.contractEncodeABI(
-                anything(),
-                anything(),
-                anything(),
-                anything()
-            )
-        ).thenCall(
+        when(connector.contractEncodeABI(anything(), anything(), anything(), anything())).thenCall(
             (_: unknown, __: string, methodName: string, params: unknown[]) => {
                 return {methodName, params}
             }
@@ -40,13 +30,8 @@ describe('MultiCallService', () => {
 
     describe('callByGasLimit() full successful multicall', () => {
         beforeEach(() => {
-            when(
-                connector.decodeABIParameterList(anything(), anything())
-            ).thenCall(
-                (
-                    _: unknown,
-                    callData: {methodName: string; params: unknown[]}
-                ) => {
+            when(connector.decodeABIParameterList(anything(), anything())).thenCall(
+                (_: unknown, callData: {methodName: string; params: unknown[]}) => {
                     return {
                         results: callData.params[0],
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -72,18 +57,12 @@ describe('MultiCallService', () => {
                 {to: '10', data: '10', gas: 100}
             ]
 
-            const result = await multiCallService.callByGasLimit(
-                requests,
-                gasLimit,
-                {
-                    ...defaultParamsWithGas,
-                    maxChunkSize: 3
-                }
-            )
+            const result = await multiCallService.callByGasLimit(requests, gasLimit, {
+                ...defaultParamsWithGas,
+                maxChunkSize: 3
+            })
 
-            expect(result).toEqual(
-                requests.map((r) => ({to: r.to, data: r.data}))
-            )
+            expect(result).toEqual(requests.map((r) => ({to: r.to, data: r.data})))
         })
     })
 
@@ -108,13 +87,8 @@ describe('MultiCallService', () => {
         }
 
         beforeEach(() => {
-            when(
-                connector.decodeABIParameterList(anything(), anything())
-            ).thenCall(
-                (
-                    _: unknown,
-                    callData: {methodName: string; params: unknown[]}
-                ) => {
+            when(connector.decodeABIParameterList(anything(), anything())).thenCall(
+                (_: unknown, callData: {methodName: string; params: unknown[]}) => {
                     const results = callData.params[0] as MultiCallRequest[]
 
                     return {
@@ -166,14 +140,10 @@ describe('MultiCallService', () => {
                 ]
             ]
 
-            const result = await multiCallService.callByGasLimit(
-                requests,
-                gasLimit,
-                {
-                    ...defaultParamsWithGas,
-                    maxChunkSize: 3
-                }
-            )
+            const result = await multiCallService.callByGasLimit(requests, gasLimit, {
+                ...defaultParamsWithGas,
+                maxChunkSize: 3
+            })
 
             const ethCalls = capture(connector.ethCall)
 
@@ -186,9 +156,7 @@ describe('MultiCallService', () => {
             )
 
             expect(ethCallArguments).toEqual(expectedRequestsByChunks)
-            expect(result).toEqual(
-                requests.map((r) => ({to: r.to, data: r.data}))
-            )
+            expect(result).toEqual(requests.map((r) => ({to: r.to, data: r.data})))
         })
     })
 })

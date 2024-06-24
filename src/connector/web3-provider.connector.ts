@@ -9,10 +9,7 @@ export interface IWeb3CallInfo {
 
 export interface IWeb3 {
     eth: {
-        call(
-            callInfo: IWeb3CallInfo,
-            blockNumber: number | string
-        ): Promise<string>
+        call(callInfo: IWeb3CallInfo, blockNumber: number | string): Promise<string>
     }
 }
 
@@ -21,20 +18,11 @@ export class Web3ProviderConnector implements ProviderConnector {
 
     constructor(protected readonly web3Provider: IWeb3) {}
 
-    contractEncodeABI(
-        abi: AbiItem[],
-        _address: string | null,
-        methodName: string,
-        methodParams: unknown[]
-    ): string {
+    contractEncodeABI(abi: AbiItem[], _address: string | null, methodName: string, methodParams: unknown[]): string {
         return new Interface(abi).encodeFunctionData(methodName, methodParams)
     }
 
-    ethCall(
-        contractAddress: string,
-        callData: string,
-        blockNumber = 'latest'
-    ): Promise<string> {
+    ethCall(contractAddress: string, callData: string, blockNumber = 'latest'): Promise<string> {
         return this.web3Provider.eth.call(
             {
                 to: contractAddress,
@@ -48,10 +36,7 @@ export class Web3ProviderConnector implements ProviderConnector {
         return this.decodeABIParameterList<[T]>([type], hex)[0]
     }
 
-    decodeABIParameterList<T>(
-        type: (string | SolStructType)[],
-        hex: string
-    ): T {
+    decodeABIParameterList<T>(type: (string | SolStructType)[], hex: string): T {
         const types = type.map((t) => {
             return typeof t === 'string'
                 ? t

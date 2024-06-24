@@ -6,18 +6,9 @@ export interface SolStructType {
 }
 
 export interface ProviderConnector {
-    contractEncodeABI(
-        abi: AbiItem[],
-        address: string | null,
-        methodName: string,
-        methodParams: unknown[]
-    ): string
+    contractEncodeABI(abi: AbiItem[], address: string | null, methodName: string, methodParams: unknown[]): string
 
-    ethCall(
-        contractAddress: string,
-        callData: string,
-        blockNumber?: string
-    ): Promise<string>
+    ethCall(contractAddress: string, callData: string, blockNumber?: string): Promise<string>
 
     decodeABIParameter<T>(type: string | SolStructType, hex: string): T
 
