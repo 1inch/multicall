@@ -3,15 +3,15 @@
 
 
 "@1inch/eslint-config@^1.4.2":
-  version "1.5.2"
-  resolved "https://npm.pkg.github.com/download/@1inch/eslint-config/1.5.2/4653978ed52aa3fa60f08b04471eda3a3c760105#4653978ed52aa3fa60f08b04471eda3a3c760105"
-  integrity sha512-TximFT7kDuOmYPE4TLOLgJYNcUVRNx9/MUVpZ4H02cRIa02azreB9ltMizkTPLWVorX7Lp+NyiIqs0ZjE1TfTA==
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@1inch/eslint-config/-/eslint-config-1.5.1.tgz#b49e917891f80d7cd93d8b5dd868f97ac8877d6a"
+  integrity sha512-KQnWM0c+VpQ11LbGsBEJJcIHeeD6x55aE69IhGt4lWG6xYqblq7ZP6Y3q5EZG00kxNj3p/yigktB81Nqz8BmEw==
   dependencies:
-    semver "^7.5.2"
+    semver "^7.5.0"
 
 "@1inch/tsconfig@^v1.0.2":
   version "1.0.7"
-  resolved "https://npm.pkg.github.com/download/@1inch/tsconfig/1.0.7/948920928f70c706075b76ee401fe1ab628a4a59#948920928f70c706075b76ee401fe1ab628a4a59"
+  resolved "https://registry.yarnpkg.com/@1inch/tsconfig/-/tsconfig-1.0.7.tgz#948920928f70c706075b76ee401fe1ab628a4a59"
   integrity sha512-uPV9toGicSHysWJANdVZTzEOX+ePKLNQybWKMKOtVBJRpHZmLGq9il5FgUOyIFXlTHBDDQXjrAwgKBhZ5mlMuw==
   dependencies:
     semver "^7.5.4"
@@ -3783,7 +3783,7 @@ semver@^6.3.0, semver@^6.3.1:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
   integrity sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==
 
-semver@^7.0.0, semver@^7.3.4, semver@^7.3.7, semver@^7.5.2, semver@^7.5.3, semver@^7.5.4:
+semver@^7.0.0, semver@^7.3.4, semver@^7.3.7, semver@^7.5.0, semver@^7.5.3, semver@^7.5.4:
   version "7.6.2"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.2.tgz#1e3b34759f896e8f14d6134732ce798aeb0c6e13"
   integrity sha512-FNAIBWCx9qcRhoHcgcJ0gvU7SN1lYU2ZXuSfl04bSC5OpvDHFyJCjdNHomPXxjQlCBU67YW64PzY7/VIEH7F2w==
