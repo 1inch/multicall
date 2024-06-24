@@ -24,14 +24,18 @@ yarn add @1inch/multicall
 
 ## Onchain addresses
 
--   Ethereum mainnet: `0x8d035edd8e09c3283463dade67cc0d49d6868063`
--   BSC mainnet: `0x804708de7af615085203fa2b18eae59c5738e2a9`
--   Polygon mainnet: `0x0196e8a9455a90d392b46df8560c867e7df40b34`
--   Arbitrum One: `0x11DEE30E710B8d4a8630392781Cc3c0046365d4c`
--   Gnosis Chain: `0xE295aD71242373C37C5FdA7B57F26f9eA1088AFe`
--   Avalanche: `0xC4A8B7e29E3C8ec560cd4945c1cF3461a85a148d`
--   Fantom: `0xA31bB36c5164B165f9c36955EA4CcBaB42B3B28E`
--   Optimism: `0xE295aD71242373C37C5FdA7B57F26f9eA1088AFe`
+- Ethereum mainnet: `0x8d035edd8e09c3283463dade67cc0d49d6868063`
+- BSC mainnet: `0x804708de7af615085203fa2b18eae59c5738e2a9`
+- Polygon mainnet: `0x0196e8a9455a90d392b46df8560c867e7df40b34`
+- Arbitrum One: `0x11DEE30E710B8d4a8630392781Cc3c0046365d4c`
+- Gnosis Chain: `0xE295aD71242373C37C5FdA7B57F26f9eA1088AFe`
+- Avalanche: `0xC4A8B7e29E3C8ec560cd4945c1cF3461a85a148d`
+- Fantom: `0xA31bB36c5164B165f9c36955EA4CcBaB42B3B28E`
+- Optimism: `0xE295aD71242373C37C5FdA7B57F26f9eA1088AFe`
+- Base: `0x138ce40d675f9a23e4d6127a8600308cf7a93381`
+- Aurora: `0xa0446d8804611944f1b527ecd37d7dcbe442caba`
+- zkSync Era: `0xae1f66df155c611c15a23f31acf5a9bf1b87907e`
+- Klaytn: `0xa31bb36c5164b165f9c36955ea4ccbab42b3b28e`
 
 ## Motivation
 The **MultiCall** contract is designed to execute multiple view calls at one time.  
