@@ -1,7 +1,5 @@
-import {CHAIN_1_MULTICALL_ADDRESS, Web3ProviderConnector} from '../src';
-import Web3 from 'web3';
+import {CHAIN_1_MULTICALL_ADDRESS, IWeb3CallInfo, ProviderConnector, Web3ProviderConnector} from '../src';
 import ERC20ABI from './ERC20.abi.json';
-import {ProviderConnector} from '../dist';
 import { GasLimitService } from '../src/gas-limit.service';
 import { MultiCallService } from '../src/multicall.service';
 import { CALL_BY_GAS_LIMIT_SNAPSHOT } from './call-by-gas-limit.snapshot';
@@ -23,7 +21,6 @@ const expectedBalances = [
 ];
 
 describe('MultiCallService', () => {
-    let web3: Web3;
     let provider: ProviderConnector;
     let gasLimitService: GasLimitService;
     let multiCallService: MultiCallService;
@@ -47,8 +44,13 @@ describe('MultiCallService', () => {
     ];
 
     beforeEach(() => {
-        web3 = new Web3(new Web3.providers.HttpProvider(''));
-        provider = new Web3ProviderConnector(web3);
+        provider = new Web3ProviderConnector({
+            eth: {
+                call: async (_callInfo: IWeb3CallInfo, _blockNumber: string | number): Promise<string> => {
+                    return 'test_call_result'
+                }
+            }
+        });
 
         gasLimitService = new GasLimitService(provider, multiCallAddress);
         multiCallService = new MultiCallService(provider, multiCallAddress);
@@ -99,7 +101,7 @@ describe('MultiCallService', () => {
             );
 
             const balances = res.map((x) => {
-                return provider.decodeABIParameter('uint256', x).toString()
+                return provider.decodeABIParameter<string>('uint256', x).toString()
             });
 
             expect(balances).toEqual(expectedBalances);
