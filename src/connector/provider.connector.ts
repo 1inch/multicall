@@ -1,8 +1,8 @@
-import {AbiItem} from '../model/abi.model';
+import {AbiItem} from '../model/abi.model'
 
 export interface SolStructType {
-    name: string;
-    type: string | SolStructType | Array<SolStructType>;
+    name: string
+    type: string | SolStructType | Array<SolStructType>
 }
 
 export interface ProviderConnector {
@@ -11,15 +11,15 @@ export interface ProviderConnector {
         address: string | null,
         methodName: string,
         methodParams: unknown[]
-    ): string;
+    ): string
 
     ethCall(
         contractAddress: string,
         callData: string,
         blockNumber?: string
-    ): Promise<string>;
+    ): Promise<string>
 
-    decodeABIParameter<T>(type: string | SolStructType, hex: string): T;
+    decodeABIParameter<T>(type: string | SolStructType, hex: string): T
 
-    decodeABIParameterList<T>(type: string[] | SolStructType[], hex: string): T;
+    decodeABIParameterList<T>(type: string[] | SolStructType[], hex: string): T
 }

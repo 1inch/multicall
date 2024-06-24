@@ -22,3 +22,6 @@ jobs:
 
       - name: CI
         run: yarn run ci-pipeline
+
+      - name: Security
+        run: yarn audit

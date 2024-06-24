@@ -1,53 +1,53 @@
 export interface MultiCallRequest {
-    to: string;
-    data: string;
+    to: string
+    data: string
 }
 
 export interface MultiCallRequestWithGas extends MultiCallRequest {
-    gas: number;
+    gas: number
 }
 
 export interface MultiCallItemWithGas extends MultiCallRequestWithGas {
-    index: number;
+    index: number
 }
 
 export interface MultiCallItemWithGasResult extends MultiCallItemWithGas {
-    result: string;
+    result: string
 }
 
-export type MultiCallChunk = MultiCallRequest[];
+export type MultiCallChunk = MultiCallRequest[]
 
-export type MultiCallChunks = MultiCallChunk[];
+export type MultiCallChunks = MultiCallChunk[]
 
-export type MultiCallWithGasChunk = MultiCallItemWithGas[];
+export type MultiCallWithGasChunk = MultiCallItemWithGas[]
 
-export type MultiCallWithGasChunks = MultiCallWithGasChunk[];
+export type MultiCallWithGasChunks = MultiCallWithGasChunk[]
 
 export interface MultiCallWithGasContractResponse {
-    results: string[];
-    lastSuccessIndex: string;
+    results: string[]
+    lastSuccessIndex: string
 }
 
 export interface MultiCallExecutionResult {
-    responses: MultiCallItemWithGasResult[];
-    notExecutedChunks: MultiCallItemWithGas[];
+    responses: MultiCallItemWithGasResult[]
+    notExecutedChunks: MultiCallItemWithGas[]
 }
 
 export interface MultiCallParams {
-    chunkSize: number;
-    retriesLimit: number;
-    blockNumber: string | number;
+    chunkSize: number
+    retriesLimit: number
+    blockNumber: string | number
 }
 
 export interface MultiCallWithGasParams {
-    maxChunkSize: number;
-    retriesLimit: number;
-    blockNumber: string | number;
-    gasBuffer: number;
+    maxChunkSize: number
+    retriesLimit: number
+    blockNumber: string | number
+    gasBuffer: number
 }
 
 export interface GasLimitParams {
-    gasBuffer: number;
-    gasLimit: number;
-    maxGasLimit: number;
+    gasBuffer: number
+    gasLimit: number
+    maxGasLimit: number
 }
