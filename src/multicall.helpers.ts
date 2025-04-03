@@ -88,15 +88,15 @@ export function concatExecutionResults(results: MultiCallExecutionResult[]): Mul
 export async function callWithRetries<T>(retriesLimit: number, fn: () => Promise<T>): Promise<T> {
     let retriesLeft = retriesLimit
 
+    let err: unknown
     while (retriesLeft > 0) {
         try {
             return await fn()
         } catch (error) {
-            // eslint-disable-next-line no-console
-            console.warn(`multicall chunck failed: ${error?.toString()}`)
             retriesLeft -= 1
+            err = error
         }
     }
 
-    throw new Error('multicall: retries exceeded')
+    throw new Error('multicall: retries exceeded', {cause: err})
 }
