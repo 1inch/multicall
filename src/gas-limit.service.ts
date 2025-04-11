@@ -1,6 +1,5 @@
 import {GasLimitParams} from './model/multicall.model'
-import MultiCallABI from './abi/MultiCall.abi.json'
-import {DEFAULT_GAS_LIMIT} from './multicall.const'
+import {DEFAULT_GAS_LIMIT, selectors} from './multicall.const'
 import {ProviderConnector} from './connector'
 
 export const defaultGasLimitParams: Pick<GasLimitParams, 'gasBuffer' | 'maxGasLimit'> = {
@@ -14,9 +13,7 @@ export class GasLimitService {
     async calculateGasLimit(gasLimitParams: Partial<GasLimitParams> = defaultGasLimitParams): Promise<number> {
         const gasBuffer = gasLimitParams.gasBuffer || defaultGasLimitParams.gasBuffer
 
-        const gasLimit = await (gasLimitParams.gasLimit
-            ? Promise.resolve(gasLimitParams.gasLimit)
-            : this.fetchGasLimit())
+        const gasLimit = gasLimitParams.gasLimit ? gasLimitParams.gasLimit : await this.fetchGasLimit()
 
         const maxGasLimit = gasLimitParams.maxGasLimit || defaultGasLimitParams.maxGasLimit
 
@@ -27,10 +24,10 @@ export class GasLimitService {
 
     private async fetchGasLimit(): Promise<number> {
         try {
-            const callData = this.connector.contractEncodeABI(MultiCallABI, this.multiCallAddress, 'gasLeft', [])
+            const callData = selectors.gaslimit
             const res = await this.connector.ethCall(this.multiCallAddress, callData)
 
-            return +this.connector.decodeABIParameter<string>('uint256', res).toString()
+            return parseInt(res, 16)
         } catch (e) {
             // eslint-disable-next-line no-console
             console.log('cannot get gas left: ', e?.toString())

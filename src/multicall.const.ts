@@ -8,3 +8,11 @@ export const CHAIN_42_MULTICALL_ADDRESS = '0x4760676f65dd07d29889DaAD1E4D08bcE6b
 export const CHAIN_56_MULTICALL_ADDRESS = '0x804708de7af615085203fa2b18eae59c5738e2a9'
 // Polygon mainnet
 export const CHAIN_137_MULTICALL_ADDRESS = '0x0196e8a9455a90d392b46df8560c867e7df40b34'
+
+export const selectors = {
+    multicallWithGasLimitation: '0xd699fe15',
+    multicallWithGas: '0x489dba16',
+    multicall: '0xcaa5c23f',
+    gaslimit: '0x2a722839',
+    gasLeft: '0x2ddb301b'
+} as const
