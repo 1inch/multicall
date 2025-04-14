@@ -38,12 +38,14 @@ yarn add @1inch/multicall
 - Klaytn: `0xa31bb36c5164b165f9c36955ea4ccbab42b3b28e`
 
 ## Motivation
-The **MultiCall** contract is designed to execute multiple view calls at one time.  
-For example, you have a list of tokens, and you need to get balances for all the items on that list.  
+The **MultiCall** contract is designed to execute multiple view calls at one time.
+For example, you have a list of tokens, and you need to get balances for all the items on that list.
 
 Let's try to do it in the most obvious way:
 
 ```typescript
+const encodeAbi = ...
+
 const provider = new Web3ProviderConnector(new Web3('...'));
 const walletAddress = '0x1111111111111111111111111111111111111111';
 
@@ -54,7 +56,7 @@ const tokens = [
 ];
 
 const contractCalls = tokens.map((tokenAddress) => {
-    const callData = provider.contractEncodeABI(
+    const callData = encodeAbi(
         ERC20ABI,
         tokenAddress,
         'balanceOf',
@@ -70,7 +72,7 @@ const contractCalls = tokens.map((tokenAddress) => {
 const balances = await Promise.all(contractCalls);
 ```
 
-The downside to this solution is that you make as many requests for a contract as you have tokens on the list.  
+The downside to this solution is that you make as many requests for a contract as you have tokens on the list.
 And if the list is large enough, you will create a significant load on the provider.
 
 ### Simple MultiCall
@@ -84,6 +86,7 @@ A **multiCallService.callByChunks()** contract takes a list of requests, splits 
 
 Example:
 ```typescript
+const encodeAbi = ...
 const provider = new Web3ProviderConnector(new Web3('...'));
 const walletAddress = '0x1111111111111111111111111111111111111111';
 const contractAddress = '0x8d035edd8e09c3283463dade67cc0d49d6868063';
@@ -105,7 +108,7 @@ const params: MultiCallParams = {
 const callDatas = tokens.map((tokenAddress) => {
     return {
         to: tokenAddress,
-        data: provider.contractEncodeABI(
+        data: encodeAbi(
             ERC20ABI,
             tokenAddress,
             'balanceOf',
@@ -123,16 +126,16 @@ Got better! Instead of making a separate request to the provider for each item, 
 > If the call to this method exceeds the gas limit, then the entire request will be reverted.
 
 ### MultiCall by gas limit
-**Problem:**  
-The point is that the node has a limit for gas per call of the contract.  
-And it may happen that by making a simple MultiCall we will not meet this limit.  
-If the gas limit on the node is large enough, we may face a time limit on the execution of the contract method.  
+**Problem:**
+The point is that the node has a limit for gas per call of the contract.
+And it may happen that by making a simple MultiCall we will not meet this limit.
+If the gas limit on the node is large enough, we may face a time limit on the execution of the contract method.
 
 In total, **there are 2 restrictions on a node:**
 - by gas
 - by time
 
-To avoid these limitations, there is a more advanced method:  
+To avoid these limitations, there is a more advanced method:
 **multiCallService.callByGasLimit()**
 
 #### Default params
@@ -189,8 +192,8 @@ const response = await multiCallService.callByGasLimit(
 );
 ```
 
-The idea is that we request the gas limit from the node and split the requests into chunks regarding this limit.  
-Accordingly, we must set the gas limit for each request.  
+The idea is that we request the gas limit from the node and split the requests into chunks regarding this limit.
+Accordingly, we must set the gas limit for each request.
 
 >It is noteworthy that if suddenly the request does not fit into the gas limit, the entire request will not be reverted, and the request will return the results of those calls that fit into the gas limit.
 
@@ -199,21 +202,21 @@ If the call to the contract all the same does not fit into the gas limit, then t
 **You can see a more detailed description of the library's work in the diagrams below.**
 
 ### GasLimitService
-This service is used to correctly calculate the gas limit for calling a MultiCall.  
+This service is used to correctly calculate the gas limit for calling a MultiCall.
 The basic formula for calculating the limit is as follows:
 ```typescript
 const gasLimitForMultiCall = Math.min(gasLimitFromNode, maxGasLimit) - gasBuffer;
 ```
-Where:  
-`gasLimitFromNode` - is the gas limit taken from the node  
-`maxGasLimit` - limiter on top, in case the gas limit from the node is too large (may cause timeout)  
+Where:
+`gasLimitFromNode` - is the gas limit taken from the node
+`maxGasLimit` - limiter on top, in case the gas limit from the node is too large (may cause timeout)
 `gasBuffer` - is some safe buffer that allows you to avoid crossing the limit in case of unforeseen situations
 
 Example:
 ```typescript
 const gasLimitForMultiCall = (Math.min(12_000_000, 40_000_000)) - 100_000; // 11_990_000
 ```
-We believe that the multicall call should fit into 11_990_000 gas.  
+We believe that the multicall call should fit into 11_990_000 gas.
 
 #### Default params:
 - gasBuffer: **3000000**
@@ -243,7 +246,7 @@ const gasLimit: number = await gasLimitService.calculateGasLimit({
     gasLimit: 200_000,
     maxGasLimit: 200_000,
     gasBuffer: 10_000,
-    
+
 });
 ```
 
