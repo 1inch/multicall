@@ -11,7 +11,7 @@
         "build": "tsc",
         "postbuild": "cp package.json dist && cp README.md dist",
         "lint": "eslint ./src --ext .js,.ts",
-        "test": "jest --passWithNoTests",
+        "test": "jest",
         "test:coverage": "jest --collectCoverage",
         "typecheck": "tsc --noEmit --skipLibCheck",
         "prettier": "prettier --write .",
@@ -20,10 +20,9 @@
         "create-index": "cti src -b && npx replace-in-file \"export * from './abi';\" \" \" ./src/index.ts",
         "release": "standard-version"
     },
-    "dependencies": {
-        "ethers": "^6.13.1"
-    },
+    "dependencies": {},
     "devDependencies": {
+        "ethers": "^6.13.1",
         "@1inch/eslint-config": "^1.4.2",
         "@1inch/tsconfig": "^v1.0.2",
         "@swc/core": "^1.3.102",
