@@ -1,7 +1,7 @@
 import {anything, capture, instance, mock, when, verify} from 'ts-mockito'
 import {Interface} from 'ethers'
 import {ProviderConnector} from './connector'
-import {defaultParamsWithGas, MultiCallService} from './multicall.service'
+import {defaultParamsByChunkSize, defaultParamsWithGas, MultiCallService} from './multicall.service'
 import {MultiCallRequest, MultiCallRequestWithGas} from './model'
 
 import ABI from './abi/MultiCall.abi.json'
@@ -152,6 +152,96 @@ describe('MultiCallService', () => {
             expect(decodeInput(3)).toEqual(expectedRequestsByChunks[3])
             expect(decodeInput(4)).toEqual(expectedRequestsByChunks[4])
             expect(decodeInput(5)).toEqual(expectedRequestsByChunks[5])
+        })
+    })
+
+    describe('callByGasLimit() exceeded chunk split', () => {
+        it('throws when leftover calls remain after maxChunkSize halves to zero', async () => {
+            const requests: MultiCallRequestWithGas[] = [
+                {to: '0x0000000000000000000000000000000000000001', data: '0x01', gas: 100},
+                {to: '0x0000000000000000000000000000000000000002', data: '0x02', gas: 100}
+            ]
+
+            when(connector.ethCall(anything(), anything(), anything())).thenCall((_to: unknown, callData: string) => {
+                const {calls} = iface.decodeFunctionData('multicallWithGasLimitation', callData)
+
+                return iface.encodeFunctionResult('multicallWithGasLimitation', [
+                    calls.map((call: MultiCallRequest) => call.to),
+                    0
+                ])
+            })
+
+            await expect(
+                multiCallService.callByGasLimit(requests, 10_000, {
+                    ...defaultParamsWithGas,
+                    maxChunkSize: 1
+                })
+            ).rejects.toThrow('multicall: exceeded chunks split')
+        })
+
+        it('uses defaultParamsWithGas when params are omitted', async () => {
+            const requests: MultiCallRequestWithGas[] = [
+                {to: '0x0000000000000000000000000000000000000001', data: '0x01', gas: 100}
+            ]
+
+            when(connector.ethCall(anything(), anything(), anything())).thenCall((_to: unknown, callData: string) => {
+                const {calls} = iface.decodeFunctionData('multicallWithGasLimitation', callData)
+
+                return iface.encodeFunctionResult('multicallWithGasLimitation', [
+                    calls.map((call: MultiCallRequest) => call.to),
+                    0
+                ])
+            })
+
+            await expect(multiCallService.callByGasLimit(requests, 10_000)).resolves.toEqual([requests[0].to])
+        })
+    })
+
+    describe('callByChunks()', () => {
+        it('encodes a simple multicall and flattens decoded results', async () => {
+            const requests: MultiCallRequest[] = [
+                {to: '0x0000000000000000000000000000000000000001', data: '0x01'},
+                {to: '0x0000000000000000000000000000000000000002', data: '0x02'},
+                {to: '0x0000000000000000000000000000000000000003', data: '0x03'}
+            ]
+
+            when(connector.ethCall(anything(), anything(), anything())).thenCall((_to: unknown, callData: string) => {
+                const {calls} = iface.decodeFunctionData('multicall', callData)
+
+                return iface.encodeFunctionResult('multicall', [calls.map((call: MultiCallRequest) => call.to)])
+            })
+
+            const result = await multiCallService.callByChunks(requests, {
+                ...defaultParamsByChunkSize,
+                chunkSize: 2
+            })
+
+            expect(result).toEqual(requests.map((request) => request.to))
+            verify(connector.ethCall(CHAIN_1_MULTICALL_ADDRESS, anything(), anything())).once()
+        })
+
+        it('uses defaultParamsByChunkSize when params are omitted', async () => {
+            const requests: MultiCallRequest[] = [{to: '0x0000000000000000000000000000000000000001', data: '0x01'}]
+
+            when(connector.ethCall(anything(), anything(), anything())).thenCall((_to: unknown, callData: string) => {
+                const {calls} = iface.decodeFunctionData('multicall', callData)
+
+                return iface.encodeFunctionResult('multicall', [calls.map((call: MultiCallRequest) => call.to)])
+            })
+
+            await expect(multiCallService.callByChunks(requests)).resolves.toEqual([requests[0].to])
+        })
+
+        it('rethrows after the retry budget is exhausted', async () => {
+            when(connector.ethCall(anything(), anything(), anything())).thenReject(new Error('rpc fail'))
+
+            await expect(
+                multiCallService.callByChunks([{to: '0x0000000000000000000000000000000000000001', data: '0x01'}], {
+                    ...defaultParamsByChunkSize,
+                    retriesLimit: 2
+                })
+            ).rejects.toThrow('multicall: retries exceeded')
+            verify(connector.ethCall(CHAIN_1_MULTICALL_ADDRESS, anything(), anything())).times(2)
         })
     })
 })

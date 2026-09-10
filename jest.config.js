@@ -6,7 +6,7 @@ module.exports = {
     transform: {
         '^.+\\.(t|j)s$': '@swc/jest'
     },
-    collectCoverageFrom: ['**/*.(t|j)s'],
+    collectCoverageFrom: ['**/*.(t|j)s', '!**/*.(spec|test).ts', '!**/__snapshots__/**'],
     coverageDirectory: '../coverage',
     testEnvironment: 'node',
     forceExit: true // For close all ws connections.
